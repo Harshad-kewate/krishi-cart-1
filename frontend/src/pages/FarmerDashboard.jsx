@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Package, IndianRupee, TrendingUp, TrendingDown, CheckCircle, Clock, Sparkles, Mic, Zap, X, Eye, Image as ImageIcon } from 'lucide-react';
 import { io } from 'socket.io-client';
@@ -30,7 +31,7 @@ const FarmerDashboard = () => {
   }, [selectedLocation]);
 
   useEffect(() => {
-    const socket = io('http://localhost:5000');
+    const socket = io(`${API_URL}`);
     socket.on('new_order', (order) => {
       setOrders(prev => [order, ...prev]);
     });
@@ -40,7 +41,7 @@ const FarmerDashboard = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(`${API_URL}/api/products`);
       const data = await res.json();
       setInventory(data);
     } catch (error) {
@@ -50,7 +51,7 @@ const FarmerDashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders');
+      const res = await fetch(`${API_URL}/api/orders`);
       const data = await res.json();
       setOrders(data);
     } catch (error) {
@@ -62,7 +63,7 @@ const FarmerDashboard = () => {
 
   const fetchMandiPrices = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/mandi-prices?city=${encodeURIComponent(selectedLocation)}`);
+      const res = await fetch(`${API_URL}/api/mandi-prices?city=${encodeURIComponent(selectedLocation)}`);
       const data = await res.json();
       setDataSource(data.source || 'mock');
       if (data && data.records) {
@@ -88,7 +89,7 @@ const FarmerDashboard = () => {
     if (!newItem.name || !newItem.qty || !newItem.price) return;
     
     try {
-      const res = await fetch('http://localhost:5000/api/products', {
+      const res = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)

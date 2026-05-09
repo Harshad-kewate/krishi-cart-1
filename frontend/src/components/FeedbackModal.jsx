@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, X, Send, Star } from 'lucide-react';
+import { API_URL } from '../config';
 
 const FeedbackModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +13,7 @@ const FeedbackModal = () => {
     e.preventDefault();
     setIsSending(true);
     try {
-      const res = await fetch('http://localhost:5000/api/feedback', {
+      const res = await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, rating })

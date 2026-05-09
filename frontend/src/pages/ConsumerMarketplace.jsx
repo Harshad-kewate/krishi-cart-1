@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Filter, ShoppingCart, IndianRupee, MapPin, QrCode, X, User, Clock, CheckCircle, ArrowRight, ChevronRight, TrendingUp, TrendingDown, Zap } from 'lucide-react';
@@ -43,7 +44,7 @@ const ConsumerMarketplace = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(`${API_URL}/api/products`);
       const data = await res.json();
       setProducts(data);
     } catch (error) {
@@ -53,7 +54,7 @@ const ConsumerMarketplace = () => {
 
   const fetchMandiPrices = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/mandi-prices?city=${encodeURIComponent('Lucknow')}`);
+      const res = await fetch(`${API_URL}/api/mandi-prices?city=${encodeURIComponent('Lucknow')}`);
       const data = await res.json();
       setDataSource(data.source || 'mock');
       if (data && data.records) {
@@ -72,7 +73,7 @@ const ConsumerMarketplace = () => {
     e.preventDefault();
     setIsSubmittingRating(true);
     try {
-      const res = await fetch('http://localhost:5000/api/farmer-feedback', {
+      const res = await fetch(`${API_URL}/api/farmer-feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
