@@ -75,6 +75,12 @@ const Navbar = () => {
               <input 
                 type="text" 
                 placeholder="Search for fresh produce..."
+                defaultValue={new URLSearchParams(routeLocation.search).get('search') || ''}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    navigate(`/?search=${e.target.value}`);
+                  }
+                }}
                 className="w-full bg-slate-100 border border-slate-200 rounded-full py-3 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white focus:border-primary transition-all"
               />
             </div>
@@ -114,7 +120,11 @@ const Navbar = () => {
                       className="flex items-center gap-2 text-slate-700 hover:text-primary transition-all group"
                     >
                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 group-hover:border-primary transition-all overflow-hidden">
-                        <User className="w-4 h-4 text-slate-600 group-hover:text-primary" />
+                        {user?.image ? (
+                          <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-4 h-4 text-slate-600 group-hover:text-primary" />
+                        )}
                       </div>
                       <span className="font-bold text-sm hidden md:block">{user?.name || 'My Profile'}</span>
                     </Link>

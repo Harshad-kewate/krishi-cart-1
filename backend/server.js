@@ -28,8 +28,15 @@ io.on('connection', (socket) => {
 
 // In-Memory Database for Hackathon MVP
 let products = [
-  { id: 1, name: 'Fresh Tomatoes', farmer: 'Ramesh Singh', location: 'Nashik, MH', price: 20, stock: '50kg', image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock' },
-  { id: 2, name: 'Organic Potatoes', farmer: 'Suresh Kumar', location: 'Agra, UP', price: 15, stock: '100kg', image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock' },
+  { id: 1, name: 'Fresh Tomatoes', farmer: 'Ramesh Singh', location: 'Nashik, MH', price: 20, stock: '50kg', image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 120 },
+  { id: 2, name: 'Organic Potatoes', farmer: 'Suresh Kumar', location: 'Agra, UP', price: 15, stock: '100kg', image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 85 },
+  { id: 3, name: 'Organic Potatoes', farmer: 'Raju Patel', location: 'Indore, MP', price: 14, stock: '200kg', image: 'https://images.unsplash.com/photo-1508313880080-c4bef0730395?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 42 },
+  { id: 4, name: 'Fresh Tomatoes', farmer: 'Mukesh Yadav', location: 'Pune, MH', price: 22, stock: '80kg', image: 'https://images.unsplash.com/photo-1582284540020-8acbe03f4924?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 156 },
+  { id: 5, name: 'Green Capsicum', farmer: 'Dinesh Sharma', location: 'Lucknow, UP', price: 40, stock: '30kg', image: 'https://images.unsplash.com/photo-1563514222080-61122a2bf31b?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 33 },
+  { id: 6, name: 'Red & Yellow Capsicum', farmer: 'Harish Singh', location: 'Bangalore, KA', price: 60, stock: '45kg', image: 'https://images.unsplash.com/photo-1601646271927-4a0b6d45e7f1?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 98 },
+  { id: 7, name: 'Fresh Ginger', farmer: 'Manish Tiwari', location: 'Kochi, KL', price: 80, stock: '100kg', image: 'https://images.unsplash.com/photo-1615485458034-7389ab41b2c5?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 204 },
+  { id: 8, name: 'Organic Ginger', farmer: 'Kishore Kumar', location: 'Guwahati, AS', price: 75, stock: '150kg', image: 'https://images.unsplash.com/photo-1599818815184-e1d5203f1910?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 67 },
+  { id: 9, name: 'Red Onions', farmer: 'Vijay Patil', location: 'Nashik, MH', price: 25, stock: '300kg', image: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?ixlib=rb-4.0.3&w=500&q=60', status: 'In Stock', views: 315 }
 ];
 
 let orders = [
@@ -54,8 +61,9 @@ app.post('/api/products', (req, res) => {
     location: 'Local Farm',
     price: Number(req.body.price),
     stock: req.body.qty,
-    image: 'https://images.unsplash.com/photo-1595856417537-8848d56b063d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-    status: 'In Stock'
+    image: req.body.image || 'https://images.unsplash.com/photo-1595856417537-8848d56b063d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+    status: 'In Stock',
+    views: 0
   };
   products.push(newProduct);
   res.status(201).json(newProduct);

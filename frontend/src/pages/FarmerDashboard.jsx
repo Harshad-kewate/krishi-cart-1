@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Package, IndianRupee, TrendingUp, TrendingDown, CheckCircle, Clock, Sparkles, Mic } from 'lucide-react';
+import { PlusCircle, Package, IndianRupee, TrendingUp, TrendingDown, CheckCircle, Clock, Sparkles, Mic, Zap, X, Eye, Image as ImageIcon } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from '../context/LocationContext';
+import SmartSell from '../components/SmartSell';
 
 const FarmerDashboard = () => {
   const { t } = useTranslation();
@@ -10,11 +11,12 @@ const FarmerDashboard = () => {
   const [inventory, setInventory] = useState([]);
   const [orders, setOrders] = useState([]);
   const [mandiPrices, setMandiPrices] = useState([]);
-  const [newItem, setNewItem] = useState({ name: '', qty: '', price: '' });
+  const [newItem, setNewItem] = useState({ name: '', qty: '', price: '', image: '' });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestedPrice, setSuggestedPrice] = useState(null);
 
   const [isListening, setIsListening] = useState(false);
+  const [showSmartSell, setShowSmartSell] = useState(false);
 
   // Fetch data on mount
   useEffect(() => {
@@ -92,7 +94,7 @@ const FarmerDashboard = () => {
         body: JSON.stringify(newItem)
       });
       if (res.ok) {
-        setNewItem({ name: '', qty: '', price: '' });
+        setNewItem({ name: '', qty: '', price: '', image: '' });
         setSuggestedPrice(null);
         fetchProducts(); // Refresh list
       }
@@ -271,6 +273,32 @@ const FarmerDashboard = () => {
                   </button>
                 </div>
               </div>
+
+              <div className="md:col-span-3">
+                <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-slate-400" /> {t('farmer.productImage') || 'Product Picture'}
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setNewItem({...newItem, image: reader.result});
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                  />
+                  {newItem.image && (
+                    <img src={newItem.image} alt="Preview" className="w-10 h-10 rounded-lg object-cover shadow-sm border border-slate-200 shrink-0" />
+                  )}
+                </div>
+              </div>
               
               {suggestedPrice && (
                 <div className="md:col-span-3 text-xs text-yellow-700 flex items-center gap-1 mt-1 font-bold bg-yellow-50 p-2.5 rounded-lg border border-yellow-200">
@@ -301,6 +329,7 @@ const FarmerDashboard = () => {
                     <th className="px-6 py-4 font-bold">{t('farmer.colProduce')}</th>
                     <th className="px-6 py-4 font-bold">{t('farmer.colQty')}</th>
                     <th className="px-6 py-4 font-bold">{t('farmer.colPrice')}</th>
+                    <th className="px-6 py-4 font-bold">Views</th>
                     <th className="px-6 py-4 font-bold">{t('farmer.colStatus')}</th>
                   </tr>
                 </thead>
@@ -310,6 +339,12 @@ const FarmerDashboard = () => {
                       <td className="px-6 py-4 font-bold text-slate-800 group-hover:text-primary transition-colors">{item.name}</td>
                       <td className="px-6 py-4 text-slate-600 font-medium">{item.stock || item.qty}</td>
                       <td className="px-6 py-4 text-slate-700 font-bold flex items-center gap-0.5"><IndianRupee className="w-3.5 h-3.5 text-slate-400"/>{item.price}</td>
+                      <td className="px-6 py-4 font-medium text-slate-500">
+                        <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md w-fit">
+                          <Eye className="w-4 h-4 text-slate-400" /> 
+                          {item.views || 0}
+                        </div>
+                      </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
                           <CheckCircle className="w-3 h-3" /> {item.status}
@@ -321,6 +356,40 @@ const FarmerDashboard = () => {
               </table>
             </div>
           </div>
+
+          {/* Smart Sell Banner/Toggle */}
+          {!showSmartSell ? (
+            <div className="bg-primary rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between shadow-xl shadow-primary/20 text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+              <div className="relative z-10 max-w-xl mb-6 md:mb-0">
+                <h3 className="text-3xl font-black mb-2 flex items-center gap-3">
+                  <Zap className="w-8 h-8 text-yellow-300" /> Start Smart Selling
+                </h3>
+                <p className="text-white/80 font-medium">Clear out your inventory faster with AI-driven dynamic pricing and direct matching with active buyers.</p>
+              </div>
+              <button 
+                onClick={() => setShowSmartSell(true)}
+                className="relative z-10 bg-white text-primary hover:bg-slate-50 px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg whitespace-nowrap"
+              >
+                Open Smart Sell
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+                  <Zap className="w-6 h-6 text-primary" /> Active Smart Selling
+                </h3>
+                <button 
+                  onClick={() => setShowSmartSell(false)}
+                  className="text-slate-500 hover:text-slate-700 font-bold text-sm flex items-center gap-1"
+                >
+                  <X className="w-4 h-4" /> Close
+                </button>
+              </div>
+              <SmartSell mode="sell" />
+            </div>
+          )}
         </div>
 
         {/* Right Column - Active Orders */}

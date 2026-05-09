@@ -3,13 +3,37 @@ import { User, Package, MapPin, Mail, Phone, Calendar, ChevronRight, ShoppingBag
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [purchaseHistory, setPurchaseHistory] = useState([
     { id: '#ORD-102', item: 'Fresh Tomatoes (5kg)', date: '2026-04-25', status: 'Delivered', price: '₹100' },
     { id: '#ORD-101', item: 'Organic Potatoes (2kg)', date: '2026-04-20', status: 'Delivered', price: '₹30' },
     { id: '#ORD-099', item: 'Onions (3kg)', date: '2026-04-15', status: 'Delivered', price: '₹45' },
   ]);
+
+  const [editForm, setEditForm] = useState({
+    name: user?.name || '',
+    image: user?.image || '',
+    address: user?.address || 'Lucknow, Uttar Pradesh',
+    gender: user?.gender || 'Male'
+  });
+
+  useEffect(() => {
+    if (user) {
+      setEditForm({
+        name: user.name || '',
+        image: user.image || '',
+        address: user.address || 'Lucknow, Uttar Pradesh',
+        gender: user.gender || 'Male'
+      });
+    }
+  }, [user]);
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    updateUser(editForm);
+    alert('Profile updated successfully!');
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen pt-24 pb-12">
@@ -20,8 +44,12 @@ const Profile = () => {
           {/* Left Column: User Card */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 text-center">
-              <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md">
-                <User className="w-10 h-10 text-emerald-600" />
+              <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md overflow-hidden">
+                {user?.image ? (
+                  <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-emerald-600" />
+                )}
               </div>
               <h2 className="text-2xl font-black text-slate-900">{user?.name || 'Rahul Sharma'}</h2>
               <p className="text-emerald-600 font-bold text-sm uppercase tracking-widest mb-6">Premium {user?.role || 'Consumer'}</p>
@@ -36,8 +64,12 @@ const Profile = () => {
                   <span className="text-sm font-medium">+91 98765 43210</span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-600">
+                  <User className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm font-medium">{user?.gender || 'Male'}</span>
+                </div>
+                <div className="flex items-center gap-3 text-slate-600">
                   <MapPin className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm font-medium">Lucknow, Uttar Pradesh</span>
+                  <span className="text-sm font-medium">{user?.address || 'Lucknow, Uttar Pradesh'}</span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-600">
                   <Calendar className="w-4 h-4 text-slate-400" />
@@ -70,6 +102,12 @@ const Profile = () => {
                 className={`flex-1 py-3 px-6 rounded-xl font-bold text-sm transition-all ${activeTab === 'overview' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 Overview
+              </button>
+              <button 
+                onClick={() => setActiveTab('edit')}
+                className={`flex-1 py-3 px-6 rounded-xl font-bold text-sm transition-all ${activeTab === 'edit' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
+              >
+                Edit Profile
               </button>
               <button 
                 onClick={() => setActiveTab('history')}
@@ -160,6 +198,77 @@ const Profile = () => {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'edit' && (
+              <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h3 className="text-lg font-black text-slate-900 mb-6">Edit Profile</h3>
+                <form onSubmit={handleSaveProfile} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+                      <input 
+                        type="text" 
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Gender</label>
+                      <select 
+                        value={editForm.gender}
+                        onChange={(e) => setEditForm({...editForm, gender: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-white"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Profile Image</label>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setEditForm({...editForm, image: reader.result});
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                      />
+                      {editForm.image && (
+                        <div className="mt-4 flex items-center gap-4">
+                           <img src={editForm.image} alt="Preview" className="w-16 h-16 rounded-full object-cover border-2 border-emerald-100 shadow-sm" />
+                           <span className="text-sm font-medium text-slate-500">Image selected</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Address</label>
+                      <textarea 
+                        value={editForm.address}
+                        onChange={(e) => setEditForm({...editForm, address: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none h-24"
+                        placeholder="123 Main St, City, State"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    type="submit"
+                    className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all"
+                  >
+                    Save Changes
+                  </button>
+                </form>
               </div>
             )}
 
